@@ -6,6 +6,7 @@ from PyQt5.QtCore import QTimer
 from signals import WeightSignal
 from serial_reader import SerialReader
 from flask_server import FlaskServer
+from category_mapping import CategoryMapping
 from .camera_panel import CameraPanel
 from .right_panel import RightPanel
 
@@ -46,6 +47,9 @@ class WeightUI(QWidget):
         print("Flask server started on http://127.0.0.1:5000")
 
     def _init_counter(self):
+        categories = CategoryMapping.get_categories_without_all()
+
+        self._category_counts = {category: 0 for category in categories}
         self._total_count = 0
 
     def _connect_signals(self):
@@ -101,21 +105,35 @@ class WeightUI(QWidget):
             self.right_panel.update_weight_data(self._last_data)
 
     def _on_category_changed(self, category: str):
-        print(f"Category changed to: {category}")
+        if category == "All Categories":
+            count = self._total_count
+        else:
+            count = self._category_counts.get(category, 0)
+        self.right_panel.update_count(count)
+        print(f"Category changed to: {category}, count: {count}")
 
-        # TODO:
 
-    def _on_item_detected(self,class_name:str):
-        print(f"Item detected: {class_name}")
+    def _on_item_detected(self,data:dict):
+        class_name = data.get('class_name', 'Unknown')
+        confidence = data.get('confidence', 0.0)
 
-        self._total_count += 1
+        print(f"Item detected: {class_name} (confidence: {confidence:.2f})")
 
-        self.right_panel.update_count(self._total_count)
+        category = CategoryMapping.map_to_category(class_name)
 
-        self.right_panel.update_status(
-            f"Detected: {class_name} | Total: {self._total_count}"
-        )
+        if category:
+            self._category_counts[category] += 1
+            self._total_count += 1
 
+            current_category = self.right_panel.counter_display.get_category()
+
+            if current_category == "All Categories":
+                self.right_panel.update_count(self._total_count)
+            elif current_category == category:
+                self.right_panel.update_count(self._category_counts[category])
+
+            print(f"Category counts: {self._category_counts}")
+            print(f"Total: {self._total_count}")
 
 def closeEvent(self, event):
 

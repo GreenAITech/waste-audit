@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QStyledItemDelegate
 from PyQt5.QtCore import Qt, pyqtSignal
+from category_mapping import CategoryMapping
 from . import styles
 
 
@@ -19,13 +20,7 @@ class CounterDisplay(QWidget):
 
     def _setup_ui(self):
         self.category_selector = QComboBox()
-        self.category_selector.addItems([
-            "Plastic Bottle",
-            "Tetra",
-            "Can",
-            "Glass Bottle",
-            "Others",
-        ])
+        self.category_selector.addItems(CategoryMapping.CATEGORIES)
         self.category_selector.setItemDelegate(CategoryDelegate())
         self.category_selector.setStyleSheet(styles.COMBOBOX_CATEGORY_SELECTOR)
         self.category_selector.currentTextChanged.connect(self.category_changed.emit)

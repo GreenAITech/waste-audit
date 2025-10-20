@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QFrame, QMessageBox
 from PyQt5.QtCore import QTimer
 
 from signals import WeightSignal
 from serial_reader import SerialReader
+from flask_server import FlaskServer
 from .camera_panel import CameraPanel
 from .right_panel import RightPanel
 
@@ -14,6 +17,8 @@ class WeightUI(QWidget):
         self._init_components()
         self._setup_layout()
         self._init_serial()
+        self._init_flask_server()
+        self._init_counter()
         self._connect_signals()
         self._setup_timer()
         self.resize(1080, 640)
@@ -35,6 +40,14 @@ class WeightUI(QWidget):
         self.signal = WeightSignal()
         self.reader = None
 
+    def _init_flask_server(self):
+        self.flask_server = FlaskServer(host='127.0.0.1',port=5000)
+        self.flask_server.start()
+        print("Flask server started on http://127.0.0.1:5000")
+
+    def _init_counter(self):
+        self._total_count = 0
+
     def _connect_signals(self):
         self.signal.data_received.connect(self._on_data)
         self.signal.status.connect(self.right_panel.update_status)
@@ -47,6 +60,7 @@ class WeightUI(QWidget):
         self.camera_panel.camera_connected.connect(lambda: print("Camera connected"))
         self.camera_panel.camera_disconnected.connect(lambda: print("Camera disconnected"))
 
+        self.flask_server.signals.item_received.connect(self._on_item_detected)
     def _setup_timer(self):
         self._last_data = None
         self._timer = QTimer(self)
@@ -91,7 +105,19 @@ class WeightUI(QWidget):
 
         # TODO:
 
-    def closeEvent(self, event):
+    def _on_item_detected(self,class_name:str):
+        print(f"Item detected: {class_name}")
+
+        self._total_count += 1
+
+        self.right_panel.update_count(self._total_count)
+
+        self.right_panel.update_status(
+            f"Detected: {class_name} | Total: {self._total_count}"
+        )
+
+
+def closeEvent(self, event):
 
         self._disconnect_serial()
         event.accept()

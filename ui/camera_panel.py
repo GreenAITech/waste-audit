@@ -2,13 +2,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButt
 from PyQt5.QtCore import Qt, pyqtSignal,QTimer
 from PyQt5.QtGui import QImage, QPixmap
 from . import styles
-
-try:
-    import cv2
-    OPENCV_AVAILABLE = True
-except ImportError:
-    OPENCV_AVAILABLE = False
-    print("Warning: OpenCV not installed. Camera will not work.")
+import os
 
 class CameraPanel(QWidget):
     camera_connected = pyqtSignal()
@@ -17,6 +11,8 @@ class CameraPanel(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self._connected = False
+        self._current_image_path = None
         self._init_ui()
 
     def _init_ui(self):
@@ -40,11 +36,11 @@ class CameraPanel(QWidget):
         main_layout.addLayout(self.buttons_layout)
 
     def _setup_buttons(self):
-        self.btn_connect = QPushButton("Connect Camera")
+        self.btn_connect = QPushButton("Enable Image Display")
         self.btn_connect.setStyleSheet(styles.BUTTON_CONNECT_CAMERA)
         self.btn_connect.clicked.connect(self._on_connect)
 
-        self.btn_disconnect = QPushButton("Disconnect Camera")
+        self.btn_disconnect = QPushButton("Disable Image Display")
         self.btn_disconnect.setStyleSheet(styles.BUTTON_DISCONNECT_CAMERA)
         self.btn_disconnect.clicked.connect(self._on_disconnect)
         self.btn_disconnect.setEnabled(False)
@@ -54,70 +50,33 @@ class CameraPanel(QWidget):
         self.buttons_layout.addWidget(self.btn_disconnect)
 
     def _on_connect(self):
-        if not OPENCV_AVAILABLE:
-            self.camera_label.setText("Error: OpenCV not installed\nRun: pip install opencv-python")
-            return
+        self._connected = True
+        self.btn_connect.setEnabled(False)
+        self.btn_disconnect.setEnabled(True)
+        self.camera_label.setText("Waiting...")
+        self.camera_connected.emit()
 
-        try:
-            self.camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        print("Image display")
 
-            if not self.camera.isOpened():
-                self.camera_label.setText("Failed to open camera\nCheck if camera is connected")
-                self.camera = None
-                return
 
-            self.timer = QTimer(self)
-            self.timer.timeout.connect(self._update_frame)
-            self.timer.start(33)
-
-            self.btn_connect.setEnabled(False)
-            self.btn_disconnect.setEnabled(True)
-            self.camera_label.setText("Initializing camera...")
-            self.camera_connected.emit()
-
-            print("Camera connected successfully")
-
-        except Exception as e:
-            self.camera_label.setText(f"Camera error:\n{str(e)}")
-            print(f"Camera connection error: {e}")
-            if self.camera:
-                self.camera.release()
-                self.camera = None
 
     def _on_disconnect(self):
-        if self.timer:
-            self.timer.stop()
-            self.timer = None
-        if self.camera:
-            self.camera.release()
-            self.camera = None
-
+        self._connected = False
         self.btn_connect.setEnabled(True)
         self.btn_disconnect.setEnabled(False)
-        self.camera_label.setText("Camera disconnected")
+        self.camera_label.setText("Disconnecting")
         self.camera_disconnected.emit()
-        print("Camera disconnected")
+        print("Image disconnected")
 
-    def _update_frame(self):
-        if not self.camera or not self.camera.isOpened():
+    def display_image_from_path(self, image_path:str):
+        if not self._connected:
+            print("Image display disabled")
             return
-
+        if not os.path.exists(image_path):
+            print(f"Image file not found: {image_path}")
+            return
         try:
-            ret, frame = self.camera.read()
-            if not ret or frame is None:
-                self.camera_label.setText("Failed to read frame")
-                return
-
-            self.frame_captured.emit(frame.copy())
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            height, width = frame_rgb.shape[:2]
-            qt_image = QImage(
-                frame_rgb,
-                width,
-                height,
-                QImage.Format_RGB888
-            )
-            pixmap = QPixmap.fromImage(qt_image)
+            pixmap = QPixmap(image_path)
             scaled_pixmap = pixmap.scaled(
                 self.camera_label.size(),
                 Qt.KeepAspectRatio,
@@ -125,8 +84,14 @@ class CameraPanel(QWidget):
             )
 
             self.camera_label.setPixmap(scaled_pixmap)
-
+            self._current_image_path = image_path
         except Exception as e:
-            print(f"Frame update error: {e}")
+            print(f"Error displaying image {image_path}: {e}")
             self.camera_label.setText(f"Display error:\n{str(e)}")
+
+    def get_current_image_path(self) -> str:
+        return self._current_image_path
+
+    def is_connected(self) -> bool:
+        return self._connected
 

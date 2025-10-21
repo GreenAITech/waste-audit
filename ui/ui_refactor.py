@@ -65,6 +65,7 @@ class WeightUI(QWidget):
         self.camera_panel.camera_disconnected.connect(lambda: print("Camera disconnected"))
 
         self.flask_server.signals.item_received.connect(self._on_item_detected)
+        self.flask_server.signals.new_image_received.connect(self._on_new_image)
     def _setup_timer(self):
         self._last_data = None
         self._timer = QTimer(self)
@@ -134,8 +135,10 @@ class WeightUI(QWidget):
 
             print(f"Category counts: {self._category_counts}")
             print(f"Total: {self._total_count}")
+    def _on_new_image(self,image_path:str):
+        self.camera_panel.display_image_from_path(image_path)
 
-def closeEvent(self, event):
+    def closeEvent(self, event):
 
-        self._disconnect_serial()
-        event.accept()
+            self._disconnect_serial()
+            event.accept()

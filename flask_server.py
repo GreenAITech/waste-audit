@@ -6,7 +6,7 @@ from datetime import datetime
 
 class FlaskSignals(QObject):
     item_received = pyqtSignal(dict)
-
+    new_image_received = pyqtSignal(str)
 
 class FlaskServer(QThread):
 
@@ -50,7 +50,8 @@ class FlaskServer(QThread):
                 with open(filepath, "wb") as f:
                     f.write(image_data)
 
-                print(f"Image saved: {filepath}")
+                path = os.path.abspath(filepath)
+                self.signals.new_image_received.emit(path)
 
             return jsonify({"status": "received"}), 200
 

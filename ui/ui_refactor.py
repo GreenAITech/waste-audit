@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import os
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QFrame, QMessageBox
 from PyQt5.QtCore import QTimer
 
@@ -7,6 +7,7 @@ from signals import WeightSignal
 from serial_reader import SerialReader
 from flask_server import FlaskServer
 from category_mapping import CategoryMapping
+from csv_settings import create_weight_csv_header, create_item_detected_csv_header
 from .camera_panel import CameraPanel
 from .right_panel import RightPanel
 
@@ -19,6 +20,7 @@ class WeightUI(QWidget):
         self._setup_layout()
         self._init_serial()
         self._init_flask_server()
+        self._init_csv_folder()
         self._init_counter()
         self._connect_signals()
         self._setup_timer()
@@ -45,6 +47,26 @@ class WeightUI(QWidget):
         self.flask_server = FlaskServer(host='127.0.0.1',port=5000)
         self.flask_server.start()
         print("Flask server started on http://127.0.0.1:5000")
+
+    def _init_csv_folder(self):
+        self.csv_folder = "waste_info"
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(current_dir)
+        self.folder_path = os.path.join(parent_dir, self.csv_folder)
+        if not os.path.exists(self.folder_path):
+            os.makedirs(self.folder_path)
+
+        today = datetime.now().strftime("%Y%m%d")
+        self.weight_csv_filename = f"weight_data_{today}.csv"
+        self.weight_filepath = os.path.join(self.folder_path,self.weight_csv_filename)
+        if not os.path.exists(self.weight_filepath):
+            create_weight_csv_header(self.weight_filepath)
+
+        self.category_csv_filename = f"item_detected_{today}.csv"
+        self.category_filepath = os.path.join(self.folder_path,self.category_csv_filename)
+        if not os.path.exists(self.category_filepath):
+            create_item_detected_csv_header(self.category_filepath)
+
 
     def _init_counter(self):
         categories = CategoryMapping.get_categories_without_all()

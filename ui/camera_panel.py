@@ -55,16 +55,14 @@ class CameraPanel(QWidget):
         self.btn_disconnect.setEnabled(True)
         self.camera_label.setText("Waiting...")
         self.camera_connected.emit()
-
         print("Image display")
-
 
 
     def _on_disconnect(self):
         self._connected = False
         self.btn_connect.setEnabled(True)
         self.btn_disconnect.setEnabled(False)
-        self.camera_label.setText("Disconnecting")
+        self.camera_label.setText("Disconnected")
         self.camera_disconnected.emit()
         print("Image disconnected")
 
@@ -88,10 +86,4 @@ class CameraPanel(QWidget):
         except Exception as e:
             print(f"Error displaying image {image_path}: {e}")
             self.camera_label.setText(f"Display error:\n{str(e)}")
-
-    def get_current_image_path(self) -> str:
-        return self._current_image_path
-
-    def is_connected(self) -> bool:
-        return self._connected
 

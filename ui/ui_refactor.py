@@ -7,7 +7,7 @@ from signals import WeightSignal
 from serial_reader import SerialReader
 from flask_server import FlaskServer
 from category_mapping import CategoryMapping
-from csv_settings import create_weight_csv_header, create_item_detected_csv_header
+from csv_settings import create_weight_csv_header, create_item_detected_csv_header, write_weight_data, write_item_detected_data 
 from .camera_panel import CameraPanel
 from .right_panel import RightPanel
 
@@ -126,6 +126,9 @@ class WeightUI(QWidget):
     def _refresh_ui(self):
         if self._last_data:
             self.right_panel.update_weight_data(self._last_data)
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            weight = self._last_data.get('weight', 0.0)
+            write_weight_data(self.weight_filepath, timestamp, weight)
 
     def _on_category_changed(self, category: str):
         if category == "All Categories":
@@ -139,7 +142,9 @@ class WeightUI(QWidget):
     def _on_item_detected(self,data:dict):
         class_name = data.get('class_name', 'Unknown')
         confidence = data.get('confidence', 0.0)
-
+        timestamp = data.get('timestamp_str', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        write_item_detected_data(self.category_filepath, timestamp, class_name, confidence)
+        
         print(f"Item detected: {class_name} (confidence: {confidence:.2f})")
 
         category = CategoryMapping.map_to_category(class_name)
@@ -157,6 +162,7 @@ class WeightUI(QWidget):
 
             print(f"Category counts: {self._category_counts}")
             print(f"Total: {self._total_count}")
+
     def _on_new_image(self,image_path:str):
         self.camera_panel.display_image_from_path(image_path)
 

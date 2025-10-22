@@ -42,7 +42,7 @@ class CameraPanel(QWidget):
         self.alert_label = QLabel("Please put waste items one by one into the bin.")
         self.alert_label.setStyleSheet(styles.NORMAL_LABEL)
         self.alert_label.setAlignment(Qt.AlignCenter)
-        self.alert_label.setMinimumHeight(40)
+        self.alert_label.setMinimumHeight(50)
 
 
 

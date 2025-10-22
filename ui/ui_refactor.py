@@ -98,7 +98,7 @@ class WeightUI(QWidget):
         self._last_data = None
         self._timer = QTimer(self)
         self._timer.timeout.connect(self._refresh_ui)
-        self._timer.start(1000)
+        self._timer.start(1500)
 
     def _connect_serial(self, port: str):
         if self.reader:
@@ -133,7 +133,7 @@ class WeightUI(QWidget):
         if self._last_data:
             self.right_panel.update_weight_data(self._last_data)
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            weight = self._last_data.get('weight', 0.0)
+            weight = round(self._last_data.get('NetWeight', 0.0) ,3)
             write_weight_data(self.weight_filepath, timestamp, weight)
 
     def _on_category_changed(self, category: str):

@@ -7,6 +7,7 @@ from datetime import datetime
 class FlaskSignals(QObject):
     item_received = pyqtSignal(dict)
     new_image_received = pyqtSignal(str)
+    alert_received = pyqtSignal(str)
 
 class FlaskServer(QThread):
 

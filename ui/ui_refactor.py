@@ -24,12 +24,18 @@ class WeightUI(QWidget):
         self._init_counter()
         self._connect_signals()
         self._setup_timer()
+        self._init_label_timer()
         self.resize(1080, 640)
 
     def _init_components(self):
         self.camera_panel = CameraPanel()
         self.right_panel = RightPanel()
 
+    def _init_label_timer(self):
+        self.label_timer = QTimer(self)
+        self.label_timer.timeout.connect(self.camera_panel.set_alert_normal)
+        self.label_timer.setSingleShot(True)
+        
     def _setup_layout(self):
         right_container = QFrame()
         right_container.setLayout(self.right_panel.layout())
@@ -150,6 +156,9 @@ class WeightUI(QWidget):
         category = CategoryMapping.map_to_category(class_name)
 
         if category:
+            self.camera_panel.set_alert_normal()
+            self.label_timer.stop() 
+            
             self._category_counts[category] += 1
             self._total_count += 1
 
@@ -162,6 +171,10 @@ class WeightUI(QWidget):
 
             print(f"Category counts: {self._category_counts}")
             print(f"Total: {self._total_count}")
+            
+        if not category:
+            self.camera_panel.set_alert_warning()
+            self.label_timer.start(5000)  
 
     def _on_new_image(self,image_path:str):
         self.camera_panel.display_image_from_path(image_path)

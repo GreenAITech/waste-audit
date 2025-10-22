@@ -16,6 +16,8 @@ class CameraPanel(QWidget):
         self._init_ui()
 
     def _init_ui(self):
+        self._setup_label()
+
         self.camera_frame = QFrame()
         self.camera_frame.setFrameShape(QFrame.StyledPanel)
         self.camera_frame.setStyleSheet(styles.FRAME_CAMERA)
@@ -32,8 +34,17 @@ class CameraPanel(QWidget):
         self._setup_buttons()
 
         main_layout = QVBoxLayout(self)
+        main_layout.addWidget(self.alert_label)
         main_layout.addWidget(self.camera_frame)
         main_layout.addLayout(self.buttons_layout)
+
+    def _setup_label(self):
+        self.alert_label = QLabel("Please put waste items one by one into the bin.")
+        self.alert_label.setStyleSheet(styles.NORMAL_LABEL)
+        self.alert_label.setAlignment(Qt.AlignCenter)
+        self.alert_label.setMinimumHeight(40)
+
+
 
     def _setup_buttons(self):
         self.btn_connect = QPushButton("Enable Image Display")
@@ -87,3 +98,10 @@ class CameraPanel(QWidget):
             print(f"Error displaying image {image_path}: {e}")
             self.camera_label.setText(f"Display error:\n{str(e)}")
 
+
+    def set_alert_normal(self):
+        self.alert_label.setText("Please put waste items one by one into the bin.")
+        self.alert_label.setStyleSheet(styles.NORMAL_LABEL)
+    def set_alert_warning(self):
+        self.alert_label.setText("Warning: Unrecognizable items detected, please take them out!")
+        self.alert_label.setStyleSheet(styles.ALERT_LABEL)

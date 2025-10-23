@@ -50,9 +50,9 @@ class WeightUI(QWidget):
         self.reader = None
 
     def _init_flask_server(self):
-        self.flask_server = FlaskServer(host='127.0.0.1',port=5000)
+        self.flask_server = FlaskServer(host='192.168.51.112',port=5000)
         self.flask_server.start()
-        print("Flask server started on http://127.0.0.1:5000")
+        print("Flask server started on http:/192.168.51.112:5000")
 
     def _init_csv_folder(self):
         self.csv_folder = "waste_info"

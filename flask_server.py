@@ -11,7 +11,7 @@ class FlaskSignals(QObject):
 
 class FlaskServer(QThread):
 
-    def __init__(self, host='192.168.51.112', port=5000):
+    def __init__(self, host='192.168.1.2', port=5000):
         super().__init__()
         self.host = host
         self.port = port

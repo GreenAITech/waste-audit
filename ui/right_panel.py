@@ -12,6 +12,7 @@ class RightPanel(QWidget):
     serial_disconnect_requested = pyqtSignal()
     command_requested = pyqtSignal(str)
     category_changed = pyqtSignal(str)
+    reset_clicked = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -46,6 +47,7 @@ class RightPanel(QWidget):
         self.control_buttons.zero_clicked.connect(lambda: self.command_requested.emit('Z'))
         self.control_buttons.tare_clicked.connect(lambda: self.command_requested.emit('T'))
         self.counter_display.category_changed.connect(self.category_changed.emit)
+        self.counter_display.reset_clicked.connect(self.reset_clicked.emit)
 
     def set_serial_connected(self, connected: bool):
         self.serial_selector.set_connected(connected)

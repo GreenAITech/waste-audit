@@ -7,7 +7,8 @@ from signals import WeightSignal
 from serial_reader import SerialReader
 from flask_server import FlaskServer
 from category_mapping import CategoryMapping
-from csv_settings import create_weight_csv_header, create_item_detected_csv_header, write_weight_data, write_item_detected_data 
+from csv_settings import create_weight_csv_header, create_item_detected_csv_header, write_weight_data, \
+    write_item_detected_data
 from .camera_panel import CameraPanel
 from .right_panel import RightPanel
 
@@ -25,7 +26,7 @@ class WeightUI(QWidget):
         self._connect_signals()
         self._setup_timer()
         self._init_label_timer()
-        self.resize(1080, 640)
+        self.resize(1280, 720)
 
     def _init_components(self):
         self.camera_panel = CameraPanel()
@@ -35,7 +36,7 @@ class WeightUI(QWidget):
         self.label_timer = QTimer(self)
         self.label_timer.timeout.connect(self.camera_panel.set_alert_normal)
         self.label_timer.setSingleShot(True)
-        
+
     def _setup_layout(self):
         right_container = QFrame()
         right_container.setLayout(self.right_panel.layout())
@@ -50,7 +51,7 @@ class WeightUI(QWidget):
         self.reader = None
 
     def _init_flask_server(self):
-        self.flask_server = FlaskServer(host='192.168.51.112',port=5000)
+        self.flask_server = FlaskServer(host='192.168.51.112', port=5000)
         self.flask_server.start()
         print("Flask server started on http:/192.168.51.112:5000")
 
@@ -64,15 +65,14 @@ class WeightUI(QWidget):
 
         today = datetime.now().strftime("%Y%m%d")
         self.weight_csv_filename = f"weight_data_{today}.csv"
-        self.weight_filepath = os.path.join(self.folder_path,self.weight_csv_filename)
+        self.weight_filepath = os.path.join(self.folder_path, self.weight_csv_filename)
         if not os.path.exists(self.weight_filepath):
             create_weight_csv_header(self.weight_filepath)
 
         self.category_csv_filename = f"item_detected_{today}.csv"
-        self.category_filepath = os.path.join(self.folder_path,self.category_csv_filename)
+        self.category_filepath = os.path.join(self.folder_path, self.category_csv_filename)
         if not os.path.exists(self.category_filepath):
             create_item_detected_csv_header(self.category_filepath)
-
 
     def _init_counter(self):
         categories = CategoryMapping.get_categories_without_all()
@@ -88,12 +88,14 @@ class WeightUI(QWidget):
         self.right_panel.serial_disconnect_requested.connect(self._disconnect_serial)
         self.right_panel.command_requested.connect(self._enqueue_cmd)
         self.right_panel.category_changed.connect(self._on_category_changed)
+        self.right_panel.reset_clicked.connect(self._on_reset_clicked)
 
         self.camera_panel.camera_connected.connect(lambda: print("Camera connected"))
         self.camera_panel.camera_disconnected.connect(lambda: print("Camera disconnected"))
 
         self.flask_server.signals.item_received.connect(self._on_item_detected)
         self.flask_server.signals.new_image_received.connect(self._on_new_image)
+
     def _setup_timer(self):
         self._last_data = None
         self._timer = QTimer(self)
@@ -133,7 +135,7 @@ class WeightUI(QWidget):
         if self._last_data:
             self.right_panel.update_weight_data(self._last_data)
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            weight = round(self._last_data.get('NetWeight', 0.0) ,3)
+            weight = round(self._last_data.get('NetWeight', 0.0), 3)
             write_weight_data(self.weight_filepath, timestamp, weight)
 
     def _on_category_changed(self, category: str):
@@ -144,21 +146,36 @@ class WeightUI(QWidget):
         self.right_panel.update_count(count)
         print(f"Category changed to: {category}, count: {count}")
 
+    def _init_counter(self):
+        categories = CategoryMapping.get_categories_without_all()
+        self._category_counts = {category: 0 for category in categories}
+        self._total_count = 0
 
-    def _on_item_detected(self,data:dict):
+    def _on_reset_clicked(self):
+        self._init_counter()
+        current_category = self.right_panel.counter_display.get_category()
+        if current_category == "All Categories":
+            self.right_panel.update_count(self._total_count)
+        else:
+            self.right_panel.update_count(self._category_counts.get(current_category, 0))
+
+        if self.reader:
+            self._enqueue_cmd('T')
+
+    def _on_item_detected(self, data: dict):
         class_name = data.get('class_name', 'Unknown')
         confidence = data.get('confidence', 0.0)
         timestamp = data.get('timestamp_str', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         write_item_detected_data(self.category_filepath, timestamp, class_name, confidence)
-        
+
         print(f"Item detected: {class_name} (confidence: {confidence:.2f})")
 
         category = CategoryMapping.map_to_category(class_name)
 
         if category:
             self.camera_panel.set_alert_normal()
-            self.label_timer.stop() 
-            
+            self.label_timer.stop()
+
             self._category_counts[category] += 1
             self._total_count += 1
 
@@ -171,15 +188,15 @@ class WeightUI(QWidget):
 
             print(f"Category counts: {self._category_counts}")
             print(f"Total: {self._total_count}")
-            
+
         if not category:
             self.camera_panel.set_alert_warning()
-            self.label_timer.start(5000)  
+            self.label_timer.start(5000)
 
-    def _on_new_image(self,image_path:str):
+    def _on_new_image(self, image_path: str):
         self.camera_panel.display_image_from_path(image_path)
 
     def closeEvent(self, event):
 
-            self._disconnect_serial()
-            event.accept()
+        self._disconnect_serial()
+        event.accept()

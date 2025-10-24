@@ -5,7 +5,6 @@ class CategoryMapping:
         "Carton",
         "Can",
         "Glass Bottle",
-        "Others",
     ]
 
     MAPPING = {
@@ -37,13 +36,6 @@ class CategoryMapping:
         "wine_bottle": "Glass Bottle",
         "beer_bottle": "Glass Bottle",
 
-        # Others
-        "paper": "Others",
-        "plastic_bag": "Others",
-        "cardboard": "Others",
-        "styrofoam": "Others",
-        "wrapper": "Others",
-        "unknown": "Others",
     }
 
     @classmethod

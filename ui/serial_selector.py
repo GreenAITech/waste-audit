@@ -30,7 +30,7 @@ class SerialSelector(QWidget):
         self.btn_connect.clicked.connect(self._on_connect)
 
         self.btn_disconnect = QPushButton("Disconnect")
-        self.btn_disconnect.setStyleSheet(styles.BUTTON_DISCONNECT_SERIAL)
+        self.btn_disconnect.setStyleSheet(styles.BUTTON_CONNECT_SERIAL)
         self.btn_disconnect.clicked.connect(lambda: self.disconnect_requested.emit())
         self.btn_disconnect.setEnabled(False)
 

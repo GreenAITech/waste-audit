@@ -21,7 +21,7 @@ class CameraPanel(QWidget):
         self.camera_frame = QFrame()
         self.camera_frame.setFrameShape(QFrame.StyledPanel)
         self.camera_frame.setStyleSheet(styles.FRAME_CAMERA)
-        self.camera_frame.setMinimumSize(960, 540)
+        self.camera_frame.setMinimumSize(720, 540)
         self.camera_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.camera_label = QLabel("Camera Preview (reserved)")
@@ -52,7 +52,7 @@ class CameraPanel(QWidget):
         self.btn_connect.clicked.connect(self._on_connect)
 
         self.btn_disconnect = QPushButton("Disable Image Display")
-        self.btn_disconnect.setStyleSheet(styles.BUTTON_DISCONNECT_CAMERA)
+        self.btn_disconnect.setStyleSheet(styles.BUTTON_CONNECT_CAMERA)
         self.btn_disconnect.clicked.connect(self._on_disconnect)
         self.btn_disconnect.setEnabled(False)
 

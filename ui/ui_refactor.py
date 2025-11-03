@@ -17,12 +17,12 @@ class WeightUI(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Green AI Waste Audit")
+        self._init_counter()
         self._init_components()
         self._setup_layout()
         self._init_serial()
         self._init_flask_server()
         self._init_csv_folder()
-        self._init_counter()
         self._connect_signals()
         self._setup_timer()
         self._init_label_timer()
@@ -31,6 +31,9 @@ class WeightUI(QWidget):
     def _init_components(self):
         self.camera_panel = CameraPanel()
         self.right_panel = RightPanel()
+        
+    def _init_counter(self):
+        self._total_count = 0
 
     def _init_label_timer(self):
         self.label_timer = QTimer(self)
@@ -40,7 +43,7 @@ class WeightUI(QWidget):
     def _setup_layout(self):
         right_container = QFrame()
         right_container.setLayout(self.right_panel.layout())
-        right_container.setMinimumWidth(360)
+        right_container.setMinimumWidth(720)
 
         main_layout = QHBoxLayout(self)
         main_layout.addWidget(self.camera_panel, stretch=3)
@@ -74,12 +77,6 @@ class WeightUI(QWidget):
         if not os.path.exists(self.category_filepath):
             create_item_detected_csv_header(self.category_filepath)
 
-    def _init_counter(self):
-        categories = CategoryMapping.get_categories_without_all()
-
-        self._category_counts = {category: 0 for category in categories}
-        self._total_count = 0
-
     def _connect_signals(self):
         self.signal.data_received.connect(self._on_data)
         self.signal.status.connect(self.right_panel.update_status)
@@ -87,14 +84,39 @@ class WeightUI(QWidget):
         self.right_panel.serial_connect_requested.connect(self._connect_serial)
         self.right_panel.serial_disconnect_requested.connect(self._disconnect_serial)
         self.right_panel.command_requested.connect(self._enqueue_cmd)
-        self.right_panel.category_changed.connect(self._on_category_changed)
-        self.right_panel.reset_clicked.connect(self._on_reset_clicked)
+
+        self.right_panel.category_selected.connect(self._on_category_changed)
+        self.right_panel.recognition_started.connect(self._on_recognition_started)
+        self.right_panel.recognition_paused.connect(self._on_recognition_paused)
+        self.right_panel.recognition_resumed.connect(self._on_recognition_resumed)
+        self.right_panel.recognition_completed.connect(self._on_recognition_completed)
+        self.right_panel.round_info_requested.connect(self._on_round_info_requested)
+        self.right_panel.recognition_reset.connect(self._on_reset_clicked)
 
         self.camera_panel.camera_connected.connect(lambda: print("Camera connected"))
         self.camera_panel.camera_disconnected.connect(lambda: print("Camera disconnected"))
 
         self.flask_server.signals.item_received.connect(self._on_item_detected)
         self.flask_server.signals.new_image_received.connect(self._on_new_image)
+
+    def _on_recognition_started(self, category):
+        round_num = self.right_panel.get_current_recognition_round()
+        print(f"Recognition started for Round {round_num}, Category: {category}")
+        
+
+    def _on_recognition_paused(self):
+        print("Recognition paused")
+        
+
+    def _on_recognition_resumed(self):
+        print("Recognition resumed")
+
+
+    def _on_recognition_completed(self, round_number):
+        print(f"Recognition completed for Round {round_number}")
+
+    def _on_round_info_requested(self, round_number):
+        print(f"Viewing info for Round {round_number}")
 
     def _setup_timer(self):
         self._last_data = None
@@ -139,26 +161,12 @@ class WeightUI(QWidget):
             write_weight_data(self.weight_filepath, timestamp, weight)
 
     def _on_category_changed(self, category: str):
-        if category == "All Categories":
-            count = self._total_count
-        else:
-            count = self._category_counts.get(category, 0)
+        count = self._total_count
         self.right_panel.update_count(count)
         print(f"Category changed to: {category}, count: {count}")
 
-    def _init_counter(self):
-        categories = CategoryMapping.get_categories_without_all()
-        self._category_counts = {category: 0 for category in categories}
-        self._total_count = 0
-
     def _on_reset_clicked(self):
-        self._init_counter()
-        current_category = self.right_panel.counter_display.get_category()
-        if current_category == "All Categories":
-            self.right_panel.update_count(self._total_count)
-        else:
-            self.right_panel.update_count(self._category_counts.get(current_category, 0))
-
+        self._total_count = 0
         if self.reader:
             self._enqueue_cmd('T')
 
@@ -171,25 +179,19 @@ class WeightUI(QWidget):
         print(f"Item detected: {class_name} (confidence: {confidence:.2f})")
 
         category = CategoryMapping.map_to_category(class_name)
-
-        if category:
+        current_category = self.right_panel.get_current_category()
+        if category == current_category:
             self.camera_panel.set_alert_normal()
             self.label_timer.stop()
 
-            self._category_counts[category] += 1
             self._total_count += 1
 
-            current_category = self.right_panel.counter_display.get_category()
+            self.right_panel.update_count(self._total_count)
 
-            if current_category == "All Categories":
-                self.right_panel.update_count(self._total_count)
-            elif current_category == category:
-                self.right_panel.update_count(self._category_counts[category])
-
-            print(f"Category counts: {self._category_counts}")
+            print(f"Current category: {current_category}")
             print(f"Total: {self._total_count}")
 
-        if not category:
+        else:
             self.camera_panel.set_alert_warning()
             self.label_timer.start(5000)
 

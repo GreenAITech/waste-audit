@@ -71,30 +71,26 @@ BUTTON_ZERO_TARE = """
         background-color: #ADADAD;
     }
 """
-RESET_BUTTON = """
-     QPushButton {
-        width:80px;
-        height: 80px;
-        background-color: #5b8487;
+
+BUTTON_HISTORY = """
+    QPushButton {
+        background-color: #6c757d;
         color: white;
+        font-size: 12px;
         font-weight: bold;
-        font-size: 20px;
-        font-family: 'Arial';
+        padding: 8px 12px;
         border: none;
-        border-radius: 20px; 
-        padding: 0px;  
+        border-radius: 4px;
+        min-width: 40px;
+        max-width: 80px;
     }
     QPushButton:hover {
-        background-color: #2c6165;
+        background-color: #545b62;
     }
     QPushButton:pressed {
-        background-color: #2c6165;
-    }
-    QPushButton:disabled {
-        background-color: #ADADAD;
+        background-color: #495057;
     }
 """
-
 COMBOBOX_PORT_SELECTOR = f"""
     QComboBox {{
         background-color: #f0f0f0;
@@ -139,56 +135,12 @@ COMBOBOX_PORT_SELECTOR = f"""
     }}
 """
 
-COMBOBOX_CATEGORY_SELECTOR = f"""    
-    QComboBox {{
-        background-color: #f0f0f0;
-        color: black;  
-        border: 1px solid #555555;
-        border-radius: 4px;
-        padding: 0px 30px 0px 8px;
-        min-height: 40px;
-        font-size: 20px;
-        font-family: 'Arial';
-    }}
-    QComboBox::drop-down {{
-        subcontrol-origin: padding;
-        subcontrol-position: top right;
-        width: 25px;
-        border-left: 1px solid #555555;
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 4px;
-    }}
-    QComboBox::down-arrow {{
-        image: url({_EXPAND_PNG});
-        width: 20px;
-        height: 20px;
-    }}
-    QComboBox QAbstractItemView {{
-        background-color: #f0f0f0; 
-        color: black;
-        border: 1px solid #555555;
-        outline: none;
-        padding: 0px;
-        font-size: 20px;
-    }}
-    QComboBox QAbstractItemView::item {{
-        padding-left: 10px;
-        border: none;
-    }}
-    QComboBox QAbstractItemView::item:hover {{
-        background-color: #CCCCCC;
-    }}
-    QComboBox QAbstractItemView::item:selected {{
-        background-color: #CCCCCC;
-        color: black;
-    }}
-"""
-
 FRAME_CAMERA = "background-color: #111; border: 1px solid #444;"
 
 # Label
 LABEL_CAMERA = "color: #f9f9f9; font-size: 20px;"
 LABEL_WEIGHT = "font-family: 'Arial'; font-size: 18px;"
 LABEL_STATUS = "color: #888; font-size: 12px;"
+ROUND_LABEL = "font-family: 'Arial'; color: white; background-color: #5b8487; font-size: 20px; font-weight: bold; border-radius:10px; "
 NORMAL_LABEL = "font-family: 'Arial'; color: #FFFFFF; background-color: #54B1DE; font-size: 28px; padding: 10px; border-radius:10px;"
 ALERT_LABEL = "font-family: 'Arial'; color: #FFFFFF; background-color: #ED9061; font-size: 28px; padding: 10px; border-radius:10px;"

@@ -9,6 +9,9 @@ class WeightDisplay(QWidget):
         self._setup_ui()
 
     def _setup_ui(self):
+        title_label = QLabel("Weight Display")
+        title_label.setStyleSheet(styles.LABEL_STATUS)
+
         self.label_net = QLabel("Net Weight: -- kg")
         self.label_gross = QLabel("Gross Weight: -- kg")
         self.label_tare = QLabel("Tare Weight: -- kg")
@@ -18,6 +21,8 @@ class WeightDisplay(QWidget):
             lab.setStyleSheet(styles.LABEL_WEIGHT)
 
         label_layout = QVBoxLayout()
+        label_layout.addWidget(title_label)
+        label_layout.addSpacing(10)
         label_layout.addWidget(self.label_net)
         label_layout.addSpacing(5)
         label_layout.addWidget(self.label_gross)

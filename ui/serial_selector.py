@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QStyledItemDelegate, QHBoxLayout, QPushButton, QComboBox, QMessageBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QStyledItemDelegate, QHBoxLayout, QPushButton, QComboBox, QMessageBox, QLabel
 from PyQt5.QtCore import pyqtSignal, QSize
 from serial.tools import list_ports
 from . import styles
@@ -7,7 +7,7 @@ from . import styles
 class ItemDelegate(QStyledItemDelegate):
     def sizeHint(self, option, index):
         size = super().sizeHint(option, index)
-        size.setHeight(35)
+        size.setHeight(40)
         return size
 
 
@@ -20,6 +20,9 @@ class SerialSelector(QWidget):
         self._setup_ui()
 
     def _setup_ui(self):
+        title_label = QLabel("Select Serial Port")
+        title_label.setStyleSheet(styles.LABEL_STATUS)
+
         self.port_selector = QComboBox()
         self.refresh_ports()
         self.port_selector.setItemDelegate(ItemDelegate())
@@ -42,8 +45,10 @@ class SerialSelector(QWidget):
         buttons_row.addWidget(self.btn_disconnect)
 
         main_layout = QVBoxLayout(self)
+        main_layout.addWidget(title_label)
+        main_layout.addSpacing(10)
         main_layout.addLayout(selector_row)
-        main_layout.addSpacing(30)
+        main_layout.addSpacing(20)
         main_layout.addLayout(buttons_row)
         main_layout.setContentsMargins(0, 0, 0, 0)
 

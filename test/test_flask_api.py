@@ -24,7 +24,7 @@ if __name__ == "__main__":
     print("Testing Flask API - Sending detections...")
     time.sleep(2)
 
-    items = ["plastic_bottle", "can", "glass_bottle", "tetra", "plastic_bottle"]
+    items = ["bottle", "can", "bottle", "tetra", "plastic_bottle"]
 
     for i, item in enumerate(items, 1):
         print(f"\n[{i}/5] Throwing {item}...")

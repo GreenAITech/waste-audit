@@ -1,30 +1,26 @@
 import csv
 
-def create_weight_csv_header(csv_filepath):
+def create_combined_csv_header(csv_filepath):
     headers = [
         "timestamp",
-        "weight"
+        "weight", 
+        "amount",
+        "classname",
+        "confidence"
     ]
     with open(csv_filepath,'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(headers)
 
-def create_item_detected_csv_header(csv_filepath):
-    headers = [
-        "timestamp",
-        "classname",
-        "confidence"
-    ]
-    with open(csv_filepath,'w',newline ='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(headers)
+def write_combined_data(csv_filepath, timestamp, weight, amount=0, classname=None, confidence=None):
 
-def write_weight_data(csv_filepath, timestamp, weight):
     with open(csv_filepath,'a',newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow([timestamp, weight])
+        row = [timestamp, weight, amount]
+        if classname is not None:
+            row.extend([classname, confidence or 0.0])
+        else:
+            row.extend(['', ''])
+        
+        writer.writerow(row)
 
-def write_item_detected_data(csv_filepath, timestamp, classname, confidence):
-    with open(csv_filepath,'a',newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow([timestamp, classname, confidence])

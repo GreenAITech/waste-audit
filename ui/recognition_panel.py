@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QStyledItemDelegate, QHBoxLayout, QLabel, QPushButton, QComboBox, QScrollArea
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, Qt, QTimer
+from datetime import datetime
 from . import styles
+from .history_dialog import HistoryDialog
 
 class ItemDelegate(QStyledItemDelegate):
     def sizeHint(self, option, index):
@@ -24,6 +26,7 @@ class RecognitionPanel(QWidget):
         self.is_running = False
         self.is_paused = False
         self.round_history = []
+        self._reset_current_round_data()
         self._setup_ui()
 
     def _setup_ui(self):
@@ -53,7 +56,7 @@ class RecognitionPanel(QWidget):
         self.round_label.setFixedHeight(50) 
 
         self.category_selector = QComboBox()
-        self.category_selector.addItems(["Bottle", "Can"])
+        self.category_selector.addItems(["Bottle"])
         self.category_selector.setItemDelegate(ItemDelegate())
         self.category_selector.setStyleSheet(styles.COMBOBOX_PORT_SELECTOR)
         self.category_selector.currentTextChanged.connect(self.category_selected.emit)
@@ -141,6 +144,7 @@ class RecognitionPanel(QWidget):
     
     def _on_start_clicked(self):
         self.is_running = True
+        self.current_round_data['start_time'] = datetime.now()
         self.start_button.setEnabled(False)
         self.done_button.setEnabled(True)
         self.pause_button.setEnabled(True)
@@ -151,12 +155,7 @@ class RecognitionPanel(QWidget):
         self.is_running = False
         self.is_paused = False
 
-        round_info = {
-            "round": self.current_round,
-            "category": self.category_selector.currentText()
-        }
-        self.round_history.append(round_info)
-        self._update_history_display(round_info)
+        self.current_round_data['end_time'] = datetime.now()
         self.current_round += 1
         self.round_label.setText(f"Round {self.current_round}")
 
@@ -166,7 +165,29 @@ class RecognitionPanel(QWidget):
         self.resume_button.setEnabled(False)
 
         self.done_clicked.emit()
-    
+        QTimer.singleShot(100, self._process_history_after_done)
+
+    def _process_history_after_done(self):
+        round_info = {
+            'round': self.current_round - 1,
+            'category': self.category_selector.currentText(),
+            'total_amount': self.current_round_data['total_amount'],
+            'total_weight': self.current_round_data['total_weight'],
+            'start_time': self.current_round_data['start_time'],
+            'end_time': self.current_round_data['end_time']
+        }
+        self.round_history.append(round_info)
+        self._update_history_display(round_info)
+        self._reset_current_round_data()
+
+    def _reset_current_round_data(self):
+        self.current_round_data = {
+            'total_amount': 0,
+            'total_weight': 0.0,
+            'start_time': None,
+            'end_time': None
+        }
+
     def _on_reset_clicked(self):
         self.current_round = 1
         self.round_label.setText(f"Round {self.current_round}")
@@ -202,9 +223,22 @@ class RecognitionPanel(QWidget):
     def _update_history_display(self, round_info):
         button = QPushButton(f"R{round_info['round']}: {round_info['category']}")
         button.setStyleSheet(styles.BUTTON_HISTORY)
-        button.clicked.connect(lambda: self.round_info_requested.emit(round_info['round']))
+        button.clicked.connect(lambda: self._show_round_info(round_info))
         self.history_layout.addWidget(button)
 
+    def _show_round_info(self, round_info):
+        dialog = HistoryDialog(round_info, self)
+        dialog.exec_()
+
+    def update_current_round_data(self, amount=None, weight=None):
+        if amount is not None:
+            self.current_round_data['total_amount'] = amount
+        if weight is not None:
+            self.current_round_data['total_weight'] = weight
+
+    def get_current_round_data(self):
+        return self.current_round_data.copy()
+    
     def get_current_round(self):
         return self.current_round
 
@@ -216,3 +250,7 @@ class RecognitionPanel(QWidget):
 
     def update_count(self, count: int):
         self.count_label.setText(str(count))
+
+    def update_category_options(self, categories: list):
+        self.category_selector.clear()
+        self.category_selector.addItems(categories)

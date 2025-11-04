@@ -12,13 +12,6 @@ class RightPanel(QWidget):
     serial_disconnect_requested = pyqtSignal()
     command_requested = pyqtSignal(str)
 
-    category_selected = pyqtSignal(str)
-    recognition_started = pyqtSignal(str)      
-    recognition_paused = pyqtSignal()          
-    recognition_resumed = pyqtSignal()         
-    recognition_completed = pyqtSignal(int)    
-    round_info_requested = pyqtSignal(int)
-    recognition_reset = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -55,23 +48,6 @@ class RightPanel(QWidget):
         self.control_buttons.zero_clicked.connect(lambda: self.command_requested.emit('Z'))
         self.control_buttons.tare_clicked.connect(lambda: self.command_requested.emit('T'))
 
-        self.recognition_panel.category_selected.connect(self.category_selected.emit)
-        self.recognition_panel.start_clicked.connect(self._on_recognition_start)
-        self.recognition_panel.done_clicked.connect(self._on_recognition_done)
-        self.recognition_panel.pause_clicked.connect(self.recognition_paused.emit)
-        self.recognition_panel.resume_clicked.connect(self.recognition_resumed.emit)
-        self.recognition_panel.round_info_requested.connect(self.round_info_requested.emit)
-        self.recognition_panel.reset_clicked.connect(self.recognition_reset.emit)
-
-    def _on_recognition_start(self):
-        category = self.recognition_panel.get_selected_category()
-        self.recognition_started.emit(category)
-
-    def _on_recognition_done(self):
-        round_number = self.recognition_panel.get_current_round() - 1
-        self.recognition_completed.emit(round_number)
-
-
     def set_serial_connected(self, connected: bool):
         self.serial_selector.set_connected(connected)
         self.control_buttons.set_enabled(connected)
@@ -90,3 +66,6 @@ class RightPanel(QWidget):
     
     def update_count(self, count):
         self.recognition_panel.update_count(count)
+
+    def update_category_options(self, classes: list):
+        self.recognition_panel.update_category_options(classes)

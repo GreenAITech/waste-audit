@@ -103,5 +103,5 @@ class CameraPanel(QWidget):
         self.alert_label.setText("Please put waste items one by one into the bin.")
         self.alert_label.setStyleSheet(styles.NORMAL_LABEL)
     def set_alert_warning(self):
-        self.alert_label.setText("Warning: Unrecognizable items detected, please take them out!")
+        self.alert_label.setText("Warning: Unrecognizable item detected, please take it out!")
         self.alert_label.setStyleSheet(styles.ALERT_LABEL)

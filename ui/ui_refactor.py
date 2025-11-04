@@ -24,8 +24,14 @@ class WeightUI(QWidget):
         self._init_api_client()
         self._init_csv_folder()
         self._connect_signals()
+        self._setup_timer()
         self._init_label_timer()
         self.resize(1280, 720)
+
+    def _setup_timer(self):
+        self.update_timer = QTimer(self)
+        self.update_timer.timeout.connect(self._refresh_ui)
+        self.update_timer.start(1000)  
 
     def _init_components(self):
         self.camera_panel = CameraPanel()
@@ -215,6 +221,10 @@ class WeightUI(QWidget):
     def _on_data(self, data: dict):
 
         self._last_data = data
+    
+    def _refresh_ui(self):
+        if self._last_data:
+            self.right_panel.update_weight_data(self._last_data)
 
     def _on_category_changed(self, category: str):
         count = self._total_count

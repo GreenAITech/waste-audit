@@ -12,7 +12,7 @@ class AlertDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Unrecognizable Item Alert")
         self.setModal(True)
-        self.setFixedSize(550, 350)
+        self.setFixedSize(600, 350)
         self.setWindowFlags(Qt.Dialog | Qt.WindowTitleHint | Qt.CustomizeWindowHint)
         self._init_ui()
 

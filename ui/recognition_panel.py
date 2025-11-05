@@ -114,6 +114,7 @@ class RecognitionPanel(QWidget):
         self.count_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #2C3E50; font-family: 'Arial';")
         
         layout.addLayout(main_buttons_layout)
+        layout.addSpacing(10)
         layout.addLayout(pause_resume_layout)
         layout.addSpacing(20)
         layout.addWidget(self.count_label_text)

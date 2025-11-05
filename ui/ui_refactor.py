@@ -86,13 +86,13 @@ class WeightUI(QWidget):
         self.reader = None
 
     def _init_flask_server(self):
-        self.flask_server = FlaskServer(host='127.0.0.1', port=5000)
+        self.flask_server = FlaskServer(host='192.168.1.2', port=5000)
         self.flask_server.start()
         print("Flask server started on http://192.168.1.2:5000")
 
     def _init_api_client(self):
         self.vision_connected = False
-        self.api_client = APIVisionClient(host='127.0.0.1', port=3000)
+        self.api_client = APIVisionClient(host='192.168.1.1', port=3000)
         print("API Client started to connect to http://192.168.1.1:3000")
 
 
@@ -270,8 +270,9 @@ class WeightUI(QWidget):
         confidence = data.get('confidence', 0.0)
         timestamp = data.get('timestamp_str', datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         print(f"Item detected: {class_name} (confidence: {confidence:.2f})")
-
-        category = class_name.replace('_', ' ').capitalize()
+        if class_name == 'aluminum_can':
+            class_name = 'can'
+        category = class_name.capitalize()
         current_category = self.right_panel.get_current_category()
         if category == current_category and self.right_panel.recognition_panel.is_recognition_running():
             self.camera_panel.set_alert_normal()

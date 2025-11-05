@@ -43,7 +43,7 @@ class CameraPanel(QWidget):
         self.alert_button = QPushButton("Please put waste items one by one into the bin.")
         self.alert_button.setStyleSheet(styles.NORMAL_BUTTON)
         self.alert_button.clicked.connect(self._on_alert_button_clicked)
-        self.alert_button.setMinimumHeight(70)
+        self.alert_button.setMinimumHeight(60)
         self._is_warning_state = False
 
 
@@ -113,5 +113,5 @@ class CameraPanel(QWidget):
 
     def set_alert_warning(self):
         self.alert_button.setText("Warning: Unrecognizable item detected, please take it out!")
-        self.alert_button.setStyleSheet(styles.NORMAL_BUTTON)
+        self.alert_button.setStyleSheet(styles.ALERT_BUTTON)
         self._is_warning_state = True

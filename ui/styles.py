@@ -103,7 +103,7 @@ NORMAL_BUTTON = """
         padding: 15px; 
         border-radius: 10px;
         border: none;
-        min-height: 60px;
+        min-height: 50px;
         text-align: center;
     }
 """
@@ -118,7 +118,7 @@ ALERT_BUTTON = """
         padding: 15px; 
         border-radius: 10px;
         border: none;
-        min-height: 60px;
+        min-height: 50px;
         text-align: center;
     }
     QPushButton:hover {

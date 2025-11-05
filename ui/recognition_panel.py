@@ -129,7 +129,7 @@ class RecognitionPanel(QWidget):
         
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
-        scroll_area.setMaximumHeight(120)
+        scroll_area.setMaximumHeight(100)
         
         self.history_widget = QWidget()
         self.history_layout = QHBoxLayout(self.history_widget)

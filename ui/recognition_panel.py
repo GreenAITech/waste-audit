@@ -56,7 +56,7 @@ class RecognitionPanel(QWidget):
         self.round_label.setFixedHeight(50) 
 
         self.category_selector = QComboBox()
-        self.category_selector.addItems(["Bottle"])
+        self.category_selector.addItems([])
         self.category_selector.setItemDelegate(ItemDelegate())
         self.category_selector.setStyleSheet(styles.COMBOBOX_PORT_SELECTOR)
         self.category_selector.currentTextChanged.connect(self.category_selected.emit)

@@ -97,6 +97,7 @@ class WeightUI(QWidget):
         print("Flask server started on http://192.168.1.2:5000")
 
     def _init_api_client(self):
+        self.vision_connected = False
         self.api_client = APIVisionClient(host='192.168.1.1', port=3000)
         print("API Client started to connect to http://192.168.1.1:3000")
 
@@ -114,8 +115,8 @@ class WeightUI(QWidget):
         self.category = "Unknown"
     def _init_csv_files(self):
 
-        today = datetime.now().strftime("%Y%m%d")
-        self.csv_filename = f"round_{self.round_num}_{self.category}_{today}.csv"
+        today_time = datetime.now().strftime("%Y%m%d_%H%M")
+        self.csv_filename = f"round_{self.round_num}_{self.category}_{today_time}.csv"
         self.csv_filepath = os.path.join(self.folder_path, self.csv_filename)
 
         if not os.path.exists(self.csv_filepath):
@@ -175,6 +176,8 @@ class WeightUI(QWidget):
         api_classes = [self.category.lower().replace(' ', '_')]
         self.api_client.update_accepted_classes(api_classes)
         self.api_client.enable_detection()
+        if self.reader:
+            self._enqueue_cmd('T')
 
     def _on_recognition_paused(self):
         success = self.api_client.disable_detection()

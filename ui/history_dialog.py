@@ -29,9 +29,9 @@ class HistoryDialog(QDialog):
 
         category_layout = QHBoxLayout()
         category_label = QLabel("Category:")
-        category_label.setStyleSheet("font-size:16px; font-weight: bold; color: #2C3E50;")
+        category_label.setStyleSheet(styles.LABEL_HISTORY)
         category_value = QLabel(self.round_info.get('category', 'Unknown'))
-        category_value.setStyleSheet("font-size:16px; color: #2C3E50; font-weight: bold;")
+        category_value.setStyleSheet(styles.LABEL_HISTORY)
         category_layout.addWidget(category_label)
         category_layout.addStretch()
         category_layout.addWidget(category_value)
@@ -39,25 +39,25 @@ class HistoryDialog(QDialog):
 
         amount_layout = QHBoxLayout()
         amount_label = QLabel("Total Amount:")
-        amount_label.setStyleSheet("font-size:16px; font-weight: bold; color: #2C3E50;")
+        amount_label.setStyleSheet(styles.LABEL_HISTORY)
         amount_value = QLabel(str(self.round_info.get('total_amount', 0)))
-        amount_value.setStyleSheet("font-size:16px; color: #2C3E50; font-weight: bold;")
+        amount_value.setStyleSheet(styles.LABEL_HISTORY)
         amount_layout.addWidget(amount_label)
         amount_layout.addStretch()
         amount_layout.addWidget(amount_value)
 
         weight_layout = QHBoxLayout()
         weight_label = QLabel("Total Weight:")
-        weight_label.setStyleSheet("font-size:16px; font-weight: bold; color: #2C3E50;")
+        weight_label.setStyleSheet(styles.LABEL_HISTORY)
         weight_value = QLabel(f"{self.round_info.get('total_weight', 0.0):.3f} kg")
-        weight_value.setStyleSheet("font-size:16px; color: #2C3E50; font-weight: bold;")
+        weight_value.setStyleSheet(styles.LABEL_HISTORY)
         weight_layout.addWidget(weight_label)
         weight_layout.addStretch()
         weight_layout.addWidget(weight_value)
         
         start_time_layout = QHBoxLayout()
         start_time_label = QLabel("Start Time:")
-        start_time_label.setStyleSheet("font-size:16px; font-weight: bold; color: #2C3E50;")
+        start_time_label.setStyleSheet(styles.LABEL_HISTORY)
         
         start_time_value = QLabel("Unknown")
         if (self.round_info.get('start_time') and 
@@ -65,7 +65,7 @@ class HistoryDialog(QDialog):
             start_time_text = self.round_info['start_time'].strftime('%Y-%m-%d %H:%M')
             start_time_value.setText(start_time_text)
         
-        start_time_value.setStyleSheet("font-size:16px; font-weight: bold; color: #2C3E50;")
+        start_time_value.setStyleSheet(styles.LABEL_HISTORY)
         start_time_layout.addWidget(start_time_label)
         start_time_layout.addStretch()
         start_time_layout.addWidget(start_time_value)
@@ -73,7 +73,7 @@ class HistoryDialog(QDialog):
 
         end_time_layout = QHBoxLayout()
         end_time_label = QLabel("End Time:")
-        end_time_label.setStyleSheet("font-size:16px; font-weight: bold; color: #2C3E50;")
+        end_time_label.setStyleSheet(styles.LABEL_HISTORY)
         
         end_time_value = QLabel("Unknown")
         if (self.round_info.get('end_time') and 
@@ -81,7 +81,7 @@ class HistoryDialog(QDialog):
             end_time_text = self.round_info['end_time'].strftime('%Y-%m-%d %H:%M')
             end_time_value.setText(end_time_text)
         
-        end_time_value.setStyleSheet("font-size:16px; font-weight: bold; color: #2C3E50;")
+        end_time_value.setStyleSheet(styles.LABEL_HISTORY)
         end_time_layout.addWidget(end_time_label)
         end_time_layout.addStretch()
         end_time_layout.addWidget(end_time_value)

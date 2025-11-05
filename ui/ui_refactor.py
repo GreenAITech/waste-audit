@@ -26,12 +26,44 @@ class WeightUI(QWidget):
         self._connect_signals()
         self._setup_timer()
         self._init_label_timer()
+        self._setup_vision_reconnect_timer()
         self.resize(1280, 720)
 
     def _setup_timer(self):
         self.update_timer = QTimer(self)
         self.update_timer.timeout.connect(self._refresh_ui)
         self.update_timer.start(1000)  
+
+    def _setup_vision_reconnect_timer(self):
+        self.vision_reconnect_timer = QTimer(self)
+        self.vision_reconnect_timer.timeout.connect(self._try_reconnect_vision)
+        self.vision_reconnect_timer.setSingleShot(False)
+        self._try_reconnect_vision()
+
+    def _try_reconnect_vision(self):
+        try:
+            status = self.api_client.get_status()
+            if status and not self.vision_connected:
+                self.vision_connected = True
+                self.vision_reconnect_timer.stop()
+                print("Vision connected successfully")
+                self.right_panel.update_status("Vision connected")
+                self._on_vision_status_received(status)
+            elif not status and self.vision_connected:
+                self.vision_connected = False
+                print("Vision disconnected")
+                self.right_panel.update_status("Vision disconnected")
+                self._start_reconnect_timer()
+        except Exception as e:
+            if self.vision_connected:
+                self.vision_connected = False
+                print(f"Vision connection lost: {e}")
+                self.right_panel.update_status("Vision connection lost")
+            self._start_reconnect_timer()
+            
+    def _start_reconnect_timer(self):
+        if not self.vision_reconnect_timer.isActive():
+            self.vision_reconnect_timer.start(5000) 
 
     def _init_components(self):
         self.camera_panel = CameraPanel()
@@ -67,7 +99,7 @@ class WeightUI(QWidget):
     def _init_api_client(self):
         self.api_client = APIVisionClient(host='192.168.1.1', port=3000)
         print("API Client started to connect to http://192.168.1.1:3000")
-        self.api_client.get_status()
+
 
     def _init_csv_folder(self):
         self.csv_folder = "waste_info"

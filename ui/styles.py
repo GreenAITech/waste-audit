@@ -92,6 +92,41 @@ BUTTON_HISTORY = """
         background-color: #495057;
     }
 """
+
+NORMAL_BUTTON = """
+    QPushButton {
+        font-family: 'Arial'; 
+        color: #FFFFFF; 
+        background-color: #54B1DE; 
+        font-size: 26px; 
+        font-weight: bold;
+        padding: 15px; 
+        border-radius: 10px;
+        border: none;
+        min-height: 60px;
+        text-align: center;
+    }
+"""
+
+ALERT_BUTTON = """
+    QPushButton {
+        font-family: 'Arial'; 
+        color: #FFFFFF; 
+        background-color: #F74848; 
+        font-size: 26px; 
+        font-weight: bold;
+        padding: 15px; 
+        border-radius: 10px;
+        border: none;
+        min-height: 60px;
+        text-align: center;
+    }
+    QPushButton:hover {
+        background-color: #C23838;
+        cursor: pointer;
+    }
+"""
+
 COMBOBOX_PORT_SELECTOR = f"""
     QComboBox {{
         background-color: #f0f0f0;
@@ -144,5 +179,3 @@ LABEL_WEIGHT = "font-family: 'Arial'; font-size: 18px;"
 LABEL_STATUS = "font-family: 'Arial';color: #888; font-size: 12px;"
 LABEL_HISTORY = "font-family: 'Arial';font-size:16px; color: #2C3E50; font-weight: bold;"
 ROUND_LABEL = "font-family: 'Arial'; color: white; background-color: #5b8487; font-size: 20px; font-weight: bold; border-radius:10px; "
-NORMAL_LABEL = "font-family: 'Arial'; color: #FFFFFF; background-color: #54B1DE; font-size: 26px; padding: 10px; border-radius:10px;"
-ALERT_LABEL = "font-family: 'Arial'; color: #FFFFFF; background-color: #ED9061; font-size: 26px; padding: 10px; border-radius:10px;"

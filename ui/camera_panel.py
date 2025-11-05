@@ -13,15 +13,16 @@ class CameraPanel(QWidget):
         super().__init__(parent)
         self._connected = False
         self._current_image_path = None
+        self._is_warning_state = False
         self._init_ui()
 
     def _init_ui(self):
-        self._setup_label()
+        self._setup_alert_button()
 
         self.camera_frame = QFrame()
         self.camera_frame.setFrameShape(QFrame.StyledPanel)
         self.camera_frame.setStyleSheet(styles.FRAME_CAMERA)
-        self.camera_frame.setMinimumSize(720, 540)
+        self.camera_frame.setMinimumSize(720, 520)
         self.camera_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.camera_label = QLabel("Camera Preview (reserved)")
@@ -34,15 +35,16 @@ class CameraPanel(QWidget):
         self._setup_buttons()
 
         main_layout = QVBoxLayout(self)
-        main_layout.addWidget(self.alert_label)
+        main_layout.addWidget(self.alert_button)
         main_layout.addWidget(self.camera_frame)
         main_layout.addLayout(self.buttons_layout)
 
-    def _setup_label(self):
-        self.alert_label = QLabel("Please put waste items one by one into the bin.")
-        self.alert_label.setStyleSheet(styles.NORMAL_LABEL)
-        self.alert_label.setAlignment(Qt.AlignCenter)
-        self.alert_label.setMinimumHeight(50)
+    def _setup_alert_button(self):
+        self.alert_button = QPushButton("Please put waste items one by one into the bin.")
+        self.alert_button.setStyleSheet(styles.NORMAL_BUTTON)
+        self.alert_button.clicked.connect(self._on_alert_button_clicked)
+        self.alert_button.setMinimumHeight(70)
+        self._is_warning_state = False
 
 
 
@@ -68,6 +70,11 @@ class CameraPanel(QWidget):
         self.camera_connected.emit()
         print("Image display")
 
+
+    def _on_alert_button_clicked(self):
+        if self._is_warning_state:
+            print("Alert acknowledged by user")
+            self.set_alert_normal() 
 
     def _on_disconnect(self):
         self._connected = False
@@ -100,8 +107,11 @@ class CameraPanel(QWidget):
 
 
     def set_alert_normal(self):
-        self.alert_label.setText("Please put waste items one by one into the bin.")
-        self.alert_label.setStyleSheet(styles.NORMAL_LABEL)
+        self.alert_button.setText("Please put waste items one by one into the bin.")
+        self.alert_button.setStyleSheet(styles.NORMAL_BUTTON)
+        self._is_warning_state = False
+
     def set_alert_warning(self):
-        self.alert_label.setText("Warning: Unrecognizable item detected, please take it out!")
-        self.alert_label.setStyleSheet(styles.ALERT_LABEL)
+        self.alert_button.setText("Warning: Unrecognizable item detected, please take it out!")
+        self.alert_button.setStyleSheet(styles.NORMAL_BUTTON)
+        self._is_warning_state = True

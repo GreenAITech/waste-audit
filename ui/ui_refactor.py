@@ -25,7 +25,6 @@ class WeightUI(QWidget):
         self._init_csv_folder()
         self._connect_signals()
         self._setup_timer()
-        self._init_label_timer()
         self._setup_vision_reconnect_timer()
         self.resize(1280, 720)
 
@@ -73,11 +72,6 @@ class WeightUI(QWidget):
         self._total_count = 0
         self._last_data = None
 
-    def _init_label_timer(self):
-        self.label_timer = QTimer(self)
-        self.label_timer.timeout.connect(self.camera_panel.set_alert_normal)
-        self.label_timer.setSingleShot(True)
-
     def _setup_layout(self):
         right_container = QFrame()
         right_container.setLayout(self.right_panel.layout())
@@ -92,13 +86,13 @@ class WeightUI(QWidget):
         self.reader = None
 
     def _init_flask_server(self):
-        self.flask_server = FlaskServer(host='192.168.1.2', port=5000)
+        self.flask_server = FlaskServer(host='127.0.0.1', port=5000)
         self.flask_server.start()
         print("Flask server started on http://192.168.1.2:5000")
 
     def _init_api_client(self):
         self.vision_connected = False
-        self.api_client = APIVisionClient(host='192.168.1.1', port=3000)
+        self.api_client = APIVisionClient(host='127.0.0.1', port=3000)
         print("API Client started to connect to http://192.168.1.1:3000")
 
 
@@ -281,8 +275,6 @@ class WeightUI(QWidget):
         current_category = self.right_panel.get_current_category()
         if category == current_category and self.right_panel.recognition_panel.is_recognition_running():
             self.camera_panel.set_alert_normal()
-            self.label_timer.stop()
-
             self._total_count += 1
 
             self.right_panel.update_count(self._total_count)
@@ -306,7 +298,6 @@ class WeightUI(QWidget):
 
         elif category != current_category and self.right_panel.recognition_panel.is_recognition_running():
             self.camera_panel.set_alert_warning()
-            self.label_timer.start(5000)
 
     def _on_new_image(self, image_path: str):
         self.camera_panel.display_image_from_path(image_path)

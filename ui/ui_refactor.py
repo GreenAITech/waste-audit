@@ -86,13 +86,13 @@ class WeightUI(QWidget):
         self.reader = None
 
     def _init_flask_server(self):
-        self.flask_server = FlaskServer(host='192.168.1.2', port=5000)
+        self.flask_server = FlaskServer(host='127.0.0.1', port=5000)
         self.flask_server.start()
         print("Flask server started on http://192.168.1.2:5000")
 
     def _init_api_client(self):
         self.vision_connected = False
-        self.api_client = APIVisionClient(host='192.168.1.1', port=3000)
+        self.api_client = APIVisionClient(host='127.0.0.1', port=3000)
         print("API Client started to connect to http://192.168.1.1:3000")
 
 
@@ -134,6 +134,8 @@ class WeightUI(QWidget):
 
         self.camera_panel.camera_connected.connect(lambda: print("Camera connected"))
         self.camera_panel.camera_disconnected.connect(lambda: print("Camera disconnected"))
+        self.camera_panel.alert_pause_requested.connect(self._on_recognition_paused)
+        self.camera_panel.alert_resume_requested.connect(self._on_recognition_resumed)
 
         self.flask_server.signals.item_received.connect(self._on_item_detected)
         self.flask_server.signals.new_image_received.connect(self._on_new_image)
@@ -275,7 +277,6 @@ class WeightUI(QWidget):
         category = class_name.capitalize()
         current_category = self.right_panel.get_current_category()
         if category == current_category and self.right_panel.recognition_panel.is_recognition_running():
-            self.camera_panel.set_alert_normal()
             self._total_count += 1
 
             self.right_panel.update_count(self._total_count)

@@ -18,13 +18,7 @@ class HistoryDialog(QDialog):
         
         title_label = QLabel(f"Round {self.round_info['round']} Details")
         title_label.setAlignment(Qt.AlignCenter)
-        title_label.setStyleSheet("""
-            font-size: 18px; 
-            font-weight: bold; 
-            color: #2C3E50; 
-            font-family: 'Arial';
-            padding: 10px;
-        """)
+        title_label.setStyleSheet(styles.LABEL_TITLE)
          
 
         category_layout = QHBoxLayout()

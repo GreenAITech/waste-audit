@@ -2,22 +2,24 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButt
 from PyQt5.QtCore import Qt, pyqtSignal,QTimer
 from PyQt5.QtGui import QImage, QPixmap
 from . import styles
+from .alert_dialog import AlertDialog
 import os
 
 class CameraPanel(QWidget):
     camera_connected = pyqtSignal()
     camera_disconnected = pyqtSignal()
-    frame_captured = pyqtSignal(object)
+    alert_pause_requested = pyqtSignal()
+    alert_resume_requested = pyqtSignal()
+
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._connected = False
         self._current_image_path = None
-        self._is_warning_state = False
         self._init_ui()
+        self._init_alert_dialog()
 
     def _init_ui(self):
-        self._setup_alert_button()
 
         self.camera_frame = QFrame()
         self.camera_frame.setFrameShape(QFrame.StyledPanel)
@@ -35,17 +37,14 @@ class CameraPanel(QWidget):
         self._setup_buttons()
 
         main_layout = QVBoxLayout(self)
-        main_layout.addWidget(self.alert_button)
         main_layout.addWidget(self.camera_frame)
         main_layout.addLayout(self.buttons_layout)
 
-    def _setup_alert_button(self):
-        self.alert_button = QPushButton("Please put waste items one by one into the bin.")
-        self.alert_button.setStyleSheet(styles.NORMAL_BUTTON)
-        self.alert_button.clicked.connect(self._on_alert_button_clicked)
-        self.alert_button.setMinimumHeight(60)
-        self._is_warning_state = False
-
+    def _init_alert_dialog(self):
+        self.alert_dialog = AlertDialog(self)
+        self.alert_dialog.item_removed.connect(self._on_alert_confirmed)
+        self.alert_dialog.pause_requested.connect(self._on_alert_pause_requested)   
+        self.alert_dialog.resume_requested.connect(self._on_alert_resume_requested) 
 
 
     def _setup_buttons(self):
@@ -71,11 +70,6 @@ class CameraPanel(QWidget):
         print("Image display")
 
 
-    def _on_alert_button_clicked(self):
-        if self._is_warning_state:
-            print("Alert acknowledged by user")
-            self.set_alert_normal() 
-
     def _on_disconnect(self):
         self._connected = False
         self.btn_connect.setEnabled(True)
@@ -83,6 +77,17 @@ class CameraPanel(QWidget):
         self.camera_label.setText("Disconnected")
         self.camera_disconnected.emit()
         print("Image disconnected")
+
+    def _on_alert_confirmed(self):
+        print("Alert dialog confirmed by user")
+
+    def _on_alert_pause_requested(self):
+        print("Alert dialog requested pause")
+        self.alert_pause_requested.emit()
+    
+    def _on_alert_resume_requested(self):
+        print("Alert dialog requested resume")
+        self.alert_resume_requested.emit()
 
     def display_image_from_path(self, image_path:str):
         if not self._connected:
@@ -107,11 +112,7 @@ class CameraPanel(QWidget):
 
 
     def set_alert_normal(self):
-        self.alert_button.setText("Please put waste items one by one into the bin.")
-        self.alert_button.setStyleSheet(styles.NORMAL_BUTTON)
-        self._is_warning_state = False
+        pass
 
     def set_alert_warning(self):
-        self.alert_button.setText("Warning: Unrecognizable item detected, please take it out!")
-        self.alert_button.setStyleSheet(styles.ALERT_BUTTON)
-        self._is_warning_state = True
+        self.alert_dialog.show_alert()

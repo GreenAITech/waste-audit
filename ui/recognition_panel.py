@@ -75,15 +75,18 @@ class RecognitionPanel(QWidget):
 
         self.start_button = QPushButton("Start")
         self.start_button.setStyleSheet(styles.BUTTON_CONNECT_SERIAL)
+        self.start_button.setFixedHeight(50)
         self.start_button.clicked.connect(self._on_start_clicked)
 
         self.done_button = QPushButton("Done")
         self.done_button.setStyleSheet(styles.BUTTON_CONNECT_SERIAL)
+        self.done_button.setFixedHeight(50)
         self.done_button.clicked.connect(self._on_done_clicked)
         self.done_button.setEnabled(False)
 
         self.reset_button = QPushButton("Reset")
         self.reset_button.setStyleSheet(styles.BUTTON_ZERO_TARE)
+        self.reset_button.setFixedHeight(50)
         self.reset_button.clicked.connect(self._on_reset_clicked)
 
         main_buttons_layout.addWidget(self.start_button)
@@ -94,11 +97,13 @@ class RecognitionPanel(QWidget):
 
         self.pause_button = QPushButton("Pause")
         self.pause_button.setStyleSheet(styles.BUTTON_CONNECT_SERIAL)
+        self.pause_button.setFixedHeight(50)
         self.pause_button.clicked.connect(self._on_pause_clicked)
         self.pause_button.setEnabled(False)
 
         self.resume_button = QPushButton("Resume")
         self.resume_button.setStyleSheet(styles.BUTTON_CONNECT_SERIAL)
+        self.resume_button.setFixedHeight(50)
         self.resume_button.clicked.connect(self._on_resume_clicked)
         self.resume_button.setEnabled(False)
 
@@ -114,7 +119,7 @@ class RecognitionPanel(QWidget):
         self.count_label.setStyleSheet("font-size: 40px; font-weight: bold; color: #2C3E50; font-family: 'Arial';")
         
         layout.addLayout(main_buttons_layout)
-        layout.addSpacing(10)
+        layout.addSpacing(20)
         layout.addLayout(pause_resume_layout)
         layout.addSpacing(20)
         layout.addWidget(self.count_label_text)

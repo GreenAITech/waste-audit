@@ -28,8 +28,8 @@ class WeightDisplay(QWidget):
         label_layout.addWidget(self.label_gross)
         label_layout.addSpacing(5)
         label_layout.addWidget(self.label_tare)
-        label_layout.addSpacing(5)
-        label_layout.addWidget(self.label_flags)
+        # label_layout.addSpacing(5)
+        # label_layout.addWidget(self.label_flags)
 
         self.setLayout(label_layout)
 
